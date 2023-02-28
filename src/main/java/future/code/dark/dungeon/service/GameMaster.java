@@ -9,26 +9,23 @@ import future.code.dark.dungeon.domen.GameObject;
 import future.code.dark.dungeon.domen.Map;
 import future.code.dark.dungeon.domen.Player;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import javax.swing.*;
+import java.awt.*;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static future.code.dark.dungeon.config.Configuration.COIN_CHARACTER;
-import static future.code.dark.dungeon.config.Configuration.ENEMIES_ACTIVE;
-import static future.code.dark.dungeon.config.Configuration.ENEMY_CHARACTER;
-import static future.code.dark.dungeon.config.Configuration.EXIT_CHARACTER;
-import static future.code.dark.dungeon.config.Configuration.PLAYER_CHARACTER;
+import static future.code.dark.dungeon.config.Configuration.*;
 
 public class GameMaster {
 
     private static GameMaster instance;
-
     private final Map map;
     private final List<GameObject> gameObjects;
+    private static final Image Victory = new ImageIcon(VICTORY).getImage();
+    private static final Image GameOver = new ImageIcon(GAME_OVER).getImage();
 
     public static synchronized GameMaster getInstance() {
         if (instance == null) {
@@ -70,6 +67,13 @@ public class GameMaster {
         getStaticObjects().forEach(gameObject -> gameObject.render(graphics));
         getEnemies().forEach(gameObject -> gameObject.render(graphics));
         getPlayer().render(graphics);
+        removeCollectedCoins();
+        if(getPlayer().checkPlayerState(listOfCollisions(gameObjects))) {
+            graphics.drawImage(GameOver,0, 0, map.getWidth() * SPRITE_SIZE,map.getHeight() * SPRITE_SIZE, null);
+        }
+        if(checkLevel(gameObjects)) {
+            graphics.drawImage(Victory,0, 0, map.getWidth() * SPRITE_SIZE,map.getHeight() * SPRITE_SIZE, null);
+        }
         graphics.setColor(Color.WHITE);
         graphics.drawString(getPlayer().toString(), 10, 20);
     }
@@ -93,9 +97,28 @@ public class GameMaster {
                 .map(gameObject -> (Enemy) gameObject)
                 .collect(Collectors.toList());
     }
+    private boolean checkLevel(List<GameObject> gameObjects){
+        return gameObjects.stream()
+                .filter(gameObject -> gameObject instanceof Coin)
+                .toList().size() == 0;
+    }
+    private void removeCollectedCoins(){
+        for(GameObject go : gameObjects.stream()
+                .filter(gameObject -> gameObject instanceof Coin && ((Coin) gameObject).getState())
+                .toList()) {
+            gameObjects.remove(go);
+        }
+    }
+
+    private List<GameObject> listOfCollisions(List<GameObject> gameObjects){
+        return gameObjects.stream()
+                .filter(gameObject -> (gameObject instanceof Coin || gameObject instanceof Enemy) &&
+                        gameObject.getXPosition() == getPlayer().getXPosition() &&
+                        gameObject.getYPosition() == getPlayer().getYPosition())
+                .collect(Collectors.toList());
+    }
 
     public Map getMap() {
         return map;
     }
-
 }

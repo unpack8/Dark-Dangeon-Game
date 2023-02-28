@@ -5,7 +5,7 @@ public interface Configuration {
     String GAME_NAME="Dark Dungeon";
     String MAP_FILE_PATH = "src/main/resources/maps/map.ber";
     Boolean ENEMIES_ACTIVE = true;
-    int GAME_FRAMES_PER_SECOND = 40;
+    int GAME_FRAMES_PER_SECOND = 5;
     char WALL_CHARACTER = '1';
     char EXIT_CHARACTER = 'E';
     char LAND_CHARACTER = '0';
@@ -19,5 +19,7 @@ public interface Configuration {
     String LAND_SPRITE = "src/main/resources/assets/land/ground.png";
     String EXIT_SPRITE = "src/main/resources/assets/land/out.png";
     String COIN_SPRITE = "src/main/resources/assets/land/collectible.png";
+    String VICTORY = "src/main/resources/assets/victory.jpg";
+    String GAME_OVER = "src/main/resources/assets/game_over_screen.jpeg";
 
 }
